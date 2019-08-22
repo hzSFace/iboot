@@ -1,0 +1,21 @@
+不同Service方法：
+1.非事务方法调用两个REQUIRED方法，会执行2次Creating new transaction操作，
+方法2抛出异常回滚，不影响方法1的结果；
+2.REQUIRED方法内调用另一个REQUIRED方法，会执行1次Creating new transaction操作，一次Participating in existing transaction，
+2.1.不捕获异常，方法2抛出异常回滚，方法1的结果也回滚；
+2.2.对方法2捕获异常不抛出，不影响方法1的结果
+
+
+同一Service方法：
+Participating in existing transaction
+1.非事务方法调用两个REQUIRED方法，会执行1次Creating new transaction操作，一次Participating in existing transaction，
+方法2抛出异常回滚，不影响方法1的结果；
+2.REQUIRED方法内调用另一个REQUIRED方法，会执行1次Creating new transaction操作，一次Participating in existing transaction，
+2.1.不捕获异常，方法2抛出异常回滚，方法1的结果也回滚；
+2.2.对方法2捕获异常不抛出，报"marking existing transaction as rollback-only", 方法1的结果也回滚
+
+
+
+事务方法内部调用非事务方法，则非事务方法也会加入到该事务中，调用非事务方法时打印操作日志"Adding transactional method 'XX' with attribute:"
+
+消费者远程调用服务提供者，两者不在同一个事务中
